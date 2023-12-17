@@ -1,0 +1,8 @@
+PyMuPDF
+numpy
+opencv-python
+layoutparser
+pytesseract
+PyPDF2
+boto3
+pdf2image
