@@ -1,0 +1,174 @@
+{
+    "Page_1": {
+        "Figure": {}
+    },
+    "Page_2": {
+        "Figure": {}
+    },
+    "Page_3": {
+        "Figure": {
+            "Figure1": {
+                "caption": "Figure 1: The Transformer - model architecture",
+                "mentions": [
+                    {
+                        "prev_line": " At each step the model is auto-regressive\n[10], consuming the previously generated symbols as additional input when generating the next",
+                        "mention_line": "\n2\nFigure 1: The Transformer - model architecture",
+                        "next_line": "\nThe Transformer follows this overall architecture using stacked self-attention and point-wise, fully\nconnected layers for both the encoder and decoder, shown in the left and right halves of Figure 1,\nrespectively"
+                    },
+                    {
+                        "prev_line": "\n2\nFigure 1: The Transformer - model architecture",
+                        "mention_line": "\nThe Transformer follows this overall architecture using stacked self-attention and point-wise, fully\nconnected layers for both the encoder and decoder, shown in the left and right halves of Figure 1,\nrespectively",
+                        "next_line": "\n3"
+                    }
+                ]
+            }
+        }
+    },
+    "Page_4": {
+        "Figure": {
+            "Figure1": {
+                "caption": "Figure 2: (left) Scaled Dot-Product Attention (right) Multi-Head Attention consists of sever\nattention layers running in parallel.",
+                "mentions": [
+                    {
+                        "prev_line": "2 Attention\nAn attention function can be described as mapping a query and a set of key-value pairs to an output,\nwhere the query, keys, values, and output are all vectors",
+                        "mention_line": " The output is computed as a weighted sum\n3\nScaled Dot-Product Attention\nMulti-Head Attention\nFigure 2: (left) Scaled Dot-Product Attention",
+                        "next_line": " (right) Multi-Head Attention consists of several\nattention layers running in parallel"
+                    },
+                    {
+                        "prev_line": "2",
+                        "mention_line": "1 Scaled Dot-Product Attention\nWe call our particular attention \"Scaled Dot-Product Attention\" (Figure 2)",
+                        "next_line": " The input consists of\nqueries and keys of dimension dk, and values of dimension dv"
+                    },
+                    {
+                        "prev_line": "\n4\noutput values",
+                        "mention_line": " These are concatenated and once again projected, resulting in the final values, as\ndepicted in Figure 2",
+                        "next_line": "\nMulti-head attention allows the model to jointly attend to information from different representation\nsubspaces at different positions"
+                    },
+                    {
+                        "prev_line": " We implement this\ninside of scaled dot-product attention by masking out (setting to −∞) all values in the input\nof the softmax which correspond to illegal connections",
+                        "mention_line": " See Figure 2",
+                        "next_line": "\n3"
+                    }
+                ]
+            }
+        }
+    },
+    "Page_5": {
+        "Figure": {}
+    },
+    "Page_6": {
+        "Figure": {}
+    },
+    "Page_7": {
+        "Figure": {}
+    },
+    "Page_8": {
+        "Figure": {}
+    },
+    "Page_9": {
+        "Figure": {
+            "Figure1": {
+                "caption": "Table 3: Variations on the Transformer architecture Unlisted values are identical to those of the base\nmodel All metrics are on the English-to-German translation development set. newstest2013. Listed\nperplexities are per-wordpiece according to our byte-pair encoding. and should not be compared to\nper-word perplexities.",
+                "mentions": [
+                    {
+                        "prev_line": "2 Attention\nAn attention function can be described as mapping a query and a set of key-value pairs to an output,\nwhere the query, keys, values, and output are all vectors",
+                        "mention_line": " The output is computed as a weighted sum\n3\nScaled Dot-Product Attention\nMulti-Head Attention\nFigure 2: (left) Scaled Dot-Product Attention",
+                        "next_line": " (right) Multi-Head Attention consists of several\nattention layers running in parallel"
+                    },
+                    {
+                        "prev_line": "2",
+                        "mention_line": "1 Scaled Dot-Product Attention\nWe call our particular attention \"Scaled Dot-Product Attention\" (Figure 2)",
+                        "next_line": " The input consists of\nqueries and keys of dimension dk, and values of dimension dv"
+                    },
+                    {
+                        "prev_line": "\n4\noutput values",
+                        "mention_line": " These are concatenated and once again projected, resulting in the final values, as\ndepicted in Figure 2",
+                        "next_line": "\nMulti-head attention allows the model to jointly attend to information from different representation\nsubspaces at different positions"
+                    },
+                    {
+                        "prev_line": " We implement this\ninside of scaled dot-product attention by masking out (setting to −∞) all values in the input\nof the softmax which correspond to illegal connections",
+                        "mention_line": " See Figure 2",
+                        "next_line": "\n3"
+                    }
+                ]
+            }
+        }
+    },
+    "Page_10": {
+        "Figure": {
+            "Figure1": {
+                "caption": "able 4: The Transformer generalizes well to English constituency parsing (Results are on Section 23\nf WSJ)",
+                "mentions": [
+                    {
+                        "prev_line": "2 Attention\nAn attention function can be described as mapping a query and a set of key-value pairs to an output,\nwhere the query, keys, values, and output are all vectors",
+                        "mention_line": " The output is computed as a weighted sum\n3\nScaled Dot-Product Attention\nMulti-Head Attention\nFigure 2: (left) Scaled Dot-Product Attention",
+                        "next_line": " (right) Multi-Head Attention consists of several\nattention layers running in parallel"
+                    },
+                    {
+                        "prev_line": "2",
+                        "mention_line": "1 Scaled Dot-Product Attention\nWe call our particular attention \"Scaled Dot-Product Attention\" (Figure 2)",
+                        "next_line": " The input consists of\nqueries and keys of dimension dk, and values of dimension dv"
+                    },
+                    {
+                        "prev_line": "\n4\noutput values",
+                        "mention_line": " These are concatenated and once again projected, resulting in the final values, as\ndepicted in Figure 2",
+                        "next_line": "\nMulti-head attention allows the model to jointly attend to information from different representation\nsubspaces at different positions"
+                    },
+                    {
+                        "prev_line": " We implement this\ninside of scaled dot-product attention by masking out (setting to −∞) all values in the input\nof the softmax which correspond to illegal connections",
+                        "mention_line": " See Figure 2",
+                        "next_line": "\n3"
+                    }
+                ]
+            }
+        }
+    },
+    "Page_11": {
+        "Figure": {}
+    },
+    "Page_12": {
+        "Figure": {}
+    },
+    "Page_13": {
+        "Figure": {
+            "Figure1": {
+                "caption": "Figure 3: An example of the attention mechanism following long-distance dependencies in the\nencoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of\nthe verb 'making' completing the phrase making more difficult' Attentions here shown only for\nthe word 'making'. Different colors represent different heads. Best viewed in color.",
+                "mentions": [
+                    {
+                        "prev_line": "\n<EOS>\n<pad>\n<pad>\n<pad>\n<pad>\n<pad>\n<pad>\nIt\nis\nin\nthis\nspirit\nthat\na\nmajority\nof\nAmerican\ngovernments\nhave\npassed\nnew\nlaws\nsince\n2009\nmaking\nthe\nregistration\nor\nvoting\nprocess\nmore\ndifficult\n",
+                        "mention_line": "\n<EOS>\n<pad>\n<pad>\n<pad>\n<pad>\n<pad>\n<pad>\nFigure 3: An example of the attention mechanism following long-distance dependencies in the\nencoder self-attention in layer 5 of 6",
+                        "next_line": " Many of the attention heads attend to a distant dependency of\nthe verb ‘making’, completing the phrase ‘making"
+                    }
+                ]
+            }
+        }
+    },
+    "Page_14": {
+        "Figure": {
+            "Figure1": {
+                "caption": "Figure 4: Two attention heads, also in layer 5 of 6. apparently involved in anaphora resolution Top:\nFull attentions for head 5. Bottom Isolated attentions from just the word 'its' for attention heads 5\nand 6. Note that the attentions are very sharp for this word.",
+                "mentions": [
+                    {
+                        "prev_line": "\n<EOS>\n<pad>\nThe\nLaw\nwill\nnever\nbe\nperfect\n,\nbut\nits\napplication\nshould\nbe\njust\n-\nthis\nis\nwhat\nwe\nare\nmissing\n,\nin\nmy\nopinion\n",
+                        "mention_line": "\n<EOS>\n<pad>Figure 4: Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution",
+                        "next_line": " Top:\nFull attentions for head 5"
+                    }
+                ]
+            }
+        }
+    },
+    "Page_15": {
+        "Figure": {
+            "Figure1": {
+                "caption": "Figure 5: Many of the attention heads exhibit behaviour that seems related to the structure of the\nsentence We give two such examples above, from two different heads from the encoder self-attention\nat layer 5 of 6. The heads clearly learned to perform different tasks.",
+                "mentions": [
+                    {
+                        "prev_line": "\n<EOS>\n<pad>\nThe\nLaw\nwill\nnever\nbe\nperfect\n,\nbut\nits\napplication\nshould\nbe\njust\n-\nthis\nis\nwhat\nwe\nare\nmissing\n,\nin\nmy\nopinion\n",
+                        "mention_line": "\n<EOS>\n<pad>Figure 5: Many of the attention heads exhibit behaviour that seems related to the structure of the\nsentence",
+                        "next_line": " We give two such examples above, from two different heads from the encoder self-attention\nat layer 5 of 6"
+                    }
+                ]
+            }
+        }
+    }
+}
