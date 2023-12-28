@@ -247,13 +247,13 @@ def create_output_dict_crop_images_and_ocr(pdf_path, model, output_folder):
         output_dict[f'Page_{page_num}'] = page_dict
 
     doc.close()
-    print(output_dict)
+    #print(output_dict)
     return output_dict
 
 
 
 
-def convert_image_bbox_to_pdf(image_bbox, dpi, image_height, buffer = 3):
+def convert_image_bbox_to_pdf(image_bbox, dpi, image_height, buffer = 6):
 
     x0_img, y0_img, x1_img, y1_img = image_bbox
     scale_factor = 72 / dpi 
@@ -373,7 +373,7 @@ def create_output_native_pdf(pdf_path, model, output_folder, dpi=300):
                     text_block = closest_text._blocks[0]
                     pdf_bbox = convert_image_bbox_to_pdf((text_block.block.x_1, text_block.block.y_1, text_block.block.x_2, text_block.block.y_2), dpi, image.shape[0])
                     caption_text = get_text_in_bbox(pdf_path, pdf_bbox, page_num, spacing='dynamic', include_new_line=False)
-                    print(caption_text)
+                    #print(caption_text)
 
                 # Extract figure number from caption
                 match = re.search(r'Figure\s?(\d+)', caption_text)
