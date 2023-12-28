@@ -13,6 +13,16 @@ from PyPDF2 import PdfReader
 import re
 import warnings
 import json
+from pdfminer.high_level import extract_pages
+from pdfminer.layout import LTTextBoxHorizontal, LTTextLineHorizontal, LTChar
+import fitz  # PyMuPDF
+import re
+from PyPDF2 import PdfReader
+import layoutparser as lp
+import cv2
+import os
+from pdf2image import convert_from_path
+from PIL import Image
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="pydantic")
 
 class TextBlock:
@@ -29,6 +39,20 @@ class Rectangle:
 
     def center(self):
         return ((self.x_1 + self.x_2) / 2, (self.y_1 + self.y_2) / 2)
+
+
+class Layout:
+    def __init__(self, _blocks, page_data={}):
+        self._blocks = _blocks
+        self.page_data = page_data
+
+    def __str__(self):
+        blocks_str = ', '.join(str(block) for block in self._blocks)
+        return f"Layout(_blocks=[{blocks_str}], page_data={self.page_data})"
+
+
+
+
 
 def distance(point1, point2):
     return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
@@ -226,10 +250,159 @@ def create_output_dict_crop_images_and_ocr(pdf_path, model, output_folder):
     print(output_dict)
     return output_dict
 
+
+
+
+def convert_image_bbox_to_pdf(image_bbox, dpi, image_height, buffer = 3):
+
+    x0_img, y0_img, x1_img, y1_img = image_bbox
+    scale_factor = 72 / dpi 
+    x0_pdf = x0_img * scale_factor - buffer
+    x1_pdf = x1_img * scale_factor + buffer
+
+    y0_pdf = image_height - y1_img
+    y1_pdf = image_height - y0_img
+    y0_pdf, y1_pdf = [y * scale_factor for y in (y0_pdf, y1_pdf)]
+
+    return (x0_pdf, y0_pdf, x1_pdf, y1_pdf)
+
+
+
+def get_text_in_bbox(pdf_path, bbox, page_number, spacing='dynamic', include_new_line=False):
+    x0, y0, x1, y1 = bbox
+    text_within_bbox = ""
+    last_char = None
+
+    for page_layout in extract_pages(pdf_path, page_numbers=[page_number-1]):  # Adjusting for zero-based index
+        for element in page_layout:
+            if isinstance(element, LTTextBoxHorizontal):
+                for line in element:
+                    if isinstance(line, LTTextLineHorizontal):
+                        for char in line:
+                            if isinstance(char, LTChar):
+                                char_bbox = char.bbox
+                                if (char_bbox[0] >= x0 and char_bbox[2] <= x1 and
+                                    char_bbox[1] >= y0 and char_bbox[3] <= y1):
+                                    if spacing == 'dynamic' and last_char:
+                                        gap = char_bbox[0] - last_char[2]
+                                        avg_char_width = (last_char[2] - last_char[0] + char_bbox[2] - char_bbox[0]) / 2
+                                        if gap > avg_char_width * 0.3:  
+                                            text_within_bbox += " "
+                                    elif spacing == 'fixed' and last_char:
+                                        if (char_bbox[0] - last_char[2]) > (char_bbox[2] - char_bbox[0]) * 0.5:
+                                            text_within_bbox += " "
+                                    text_within_bbox += char.get_text()
+                                    last_char = char_bbox
+                        if include_new_line:
+                            text_within_bbox += "\n"
+    return text_within_bbox
+
+
+
+def convert_pdf_to_images(pdf_path, dpi=300):
+    images = convert_from_path(pdf_path, dpi=dpi)
+    return images  # List of PIL Image objects
+    
+def convert_pdf_to_images(pdf_path, dpi=300):
+    # Convert PDF pages to images
+    images = convert_from_path(pdf_path, dpi=dpi)
+
+    # Process each image
+    processed_images = []
+    for img in images:
+        # Convert PIL image to NumPy array
+        img_np = np.array(img)
+
+        # Convert RGB (default in PIL) to BGR (used in OpenCV)
+        img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        processed_images.append(img_bgr)
+
+    return processed_images
+
+
+def create_output_native_pdf(pdf_path, model, output_folder, dpi=300):
+    pdf_base_name = os.path.basename(pdf_path).split('.')[0]
+    images_save_path = os.path.join(output_folder, pdf_base_name)
+
+    if not os.path.exists(images_save_path):
+        os.makedirs(images_save_path)
+
+    doc = fitz.open(pdf_path)
+    images = convert_pdf_to_images(pdf_path)
+    output_dict = {}
+    all_text = []
+    line_to_page = {}  # Dictionary to map line ids to page numbers
+    line_id = 0
+    reader = PdfReader(pdf_path)
+    for page_num, page in enumerate(reader.pages, start=1):
+        text = page.extract_text()
+ 
+        if text:
+            lines = text.split("\n")
+            for line in lines:
+                line_to_page[line_id] = page_num
+                line_id += 1
+                all_text.append(line.strip())
+
+    
+    #lines_mention = '\n'.join(all_text).split('.')
+                
+    lines_mention =  re.split(r'(?<!\d)\.(?=\s)|(?<=\d)\.(?=\s)', '\n'.join(all_text))
+
+    for page_num, image in enumerate(images, start=1):
+        layout, layout_blocks = process_page(image, model)
+        page = doc.load_page(page_num - 1)
+        page_dict = {'Figure': {}}
+
+        figure_count = 1
+        for fig in layout_blocks:
+            if fig.type == 'Figure':
+                closest_blocks = find_closest_text_blocks([fig] + layout_blocks)
+                closest_text = identify_closest_text_block(closest_blocks, layout_blocks)
+
+                figure_name = f"Figure{figure_count}"
+                fig_crop_path = os.path.join(images_save_path, f"Page{page_num}_{figure_name}.png")
+                #fig_crop = page.get_pixmap(clip=fitz.Rect(fig.block.x_1, fig.block.y_1, fig.block.x_2, fig.block.y_2))
+                #fig_crop.save(fig_crop_path)
+                x1, y1, x2, y2 = int(fig.block.x_1), int(fig.block.y_1), int(fig.block.x_2), int(fig.block.y_2)
+                fig_crop = image[y1:y2, x1:x2]
+                cv2.imwrite(fig_crop_path, fig_crop)
+
+                caption_text = ""
+                if closest_text:
+                    text_block = closest_text._blocks[0]
+                    pdf_bbox = convert_image_bbox_to_pdf((text_block.block.x_1, text_block.block.y_1, text_block.block.x_2, text_block.block.y_2), dpi, image.shape[0])
+                    caption_text = get_text_in_bbox(pdf_path, pdf_bbox, page_num, spacing='dynamic', include_new_line=False)
+                    print(caption_text)
+
+                # Extract figure number from caption
+                match = re.search(r'Figure\s?(\d+)', caption_text)
+                mentions = []
+                if match:
+                    figure_number = match.group(1)
+                    
+                    for i, line in enumerate(lines_mention):
+                        if f"Figure {figure_number}" in line:
+                            
+                            prev_line = lines_mention[i - 1] if i > 0 else ""
+                            next_line = lines_mention[i + 1] if i < len(lines_mention) - 1 else ""
+                            mentions.append({'prev_line': prev_line, 'mention_line': line, 'next_line': next_line})
+
+
+                page_dict['Figure'][figure_name] = {'caption': caption_text, 'mentions': mentions}
+                figure_count += 1
+
+        output_dict[f'Page_{page_num}'] = page_dict
+
+    doc.close()
+    #print(output_dict)
+    return output_dict
+
+
 def process_pdf(pdf_path, model, output_folder, do_ocr=False):
 
     if do_ocr:
-        return create_output_dict_crop_images_and_ocr(pdf_path, model, output_folder)
+        return create_output_native_pdf(pdf_path, model, output_folder)
     else:
         create_output_dict_crop_images_no_ocr(pdf_path, model, output_folder)
 
@@ -258,6 +431,7 @@ def main(input_path, output_folder, do_ocr ,model):
         print(f"The input path {input_path} is not valid. Please specify a PDF file or a directory containing PDF files.")
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Process a PDF or a directory of PDFs.')
     parser.add_argument('--input_path', type=str, required=True, help='Path to a PDF file or a directory containing PDF files')
     parser.add_argument('--output_folder', type=str, required=True, help='Path to the output folder where results will be saved')
@@ -273,5 +447,5 @@ if __name__ == '__main__':
 
     do_ocr = not args.no_ocr 
 
-    print(f"Performing OCR: {do_ocr}")
+    print(f"extract text: {do_ocr}")
     main(args.input_path, args.output_folder, do_ocr,model)
